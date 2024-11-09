@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Home Finder</h1>
+    </header>
+    <main>
+        <form id="search-form">
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location">
+            <label for="price-range">Price Range:</label>
+            <select id="price-range" name="price-range">
+                <option value="100000-200000">$100,000 - $200,000</option>
+                <option value="200000-300000">$200,000 - $300,000</option>
+                <option value="300000-400000">$300,000 - $400,000</option>
+            </select>
+            <label for="amenities">Amenities:</label>
+            <select id="amenities" name="amenities" multiple>
+                <option value="pool">Pool</option>
+                <option value="garden">Garden</option>
+                <option value="parking">Parking</option>
+            </select>
+            <button id="search-btn">Search</button>
+        </form>
+        <div id="map-container"></div>
+        <div id="property-listings"></div>
+
+        <script src="(link unavailable)"></script>
+        <script src="script.js"></script>
+    </main>
+</body>
+</html>
+
+
+Frontend Code (styles.css)
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #f0f0f0;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+#search-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#search-form label {
+    margin-bottom: 10px;
+}
+
+#search-form input, #search-form select {
+    width: 300px;
+    height: 30px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#search-btn {
+    width: 300px;
+    height: 40px;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#map-container {
+    width: 800px;
+    height: 600px;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+}
+
+#property-listings {
+    margin-top: 20px;
+}
+
+
+Frontend Code (script.js)
+
+const searchForm = document.getElementById('search-form');
+const locationInput = document.getElementById('location');
+const priceRangeInput = document.getElementById('price-range');
+const amenitiesInput = document.getElementById('amenities');
+const mapContainer = document.getElementById('map-container');
+let map;
+
+
+searchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const location = locationInput.value;
+    const priceRange = priceRangeInput.value;
+    const amenities = amenitiesInput.value;
+
+
+    fetch('/api/properties', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            location,
+            priceRange,
+            amenities
+        })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        
+        displayProperties(data);
+    })
+    .catch((error) => console.error(error));
+});
+
+function displayProperties(properties) {
+    
+    map = new google.maps.Map(mapContainer, {
+        center: { lat: 37.7749, lng: -122.4194 },
+        zoom: 12
+    });
+
+    properties.forEach((property) => {
+        const marker = new google.maps.Marker({
+            position: { lat: property.lat, lng: property.lng },
+            map:
